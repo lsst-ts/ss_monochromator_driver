@@ -39,10 +39,10 @@
       <compileType>
         <ccTool>
           <incDir>
-            <pElem>../../Downloads/libusb-1.0.21/libusb</pElem>
+            <pElem>libusb-1.0.21/libusb</pElem>
           </incDir>
           <incFile>
-            <pElem>../../Downloads/libusb-1.0.21/libusb/libusb.h</pElem>
+            <pElem>libusb-1.0.21/libusb/libusb.h</pElem>
           </incFile>
         </ccTool>
       </compileType>
