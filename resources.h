@@ -16,7 +16,14 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
-#define IDM_ABOUTBOX    0x0010
+#define idVendor    0x0c9b //Jobin Yvon, Inc
+#define idProduct    0x0101
+
+#define bmRequestTypeGetJ    0xc0
+#define bmRequestTypeSetJ    0x40
+
+static const int INTERFACE_NUMBER = 1;
+static const int timeout = 10000;
 
 #endif /* RESOURCES_H */
 

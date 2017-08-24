@@ -65,7 +65,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libmonochromator.${CND_DLIB_EXT}: ${O
 ${OBJECTDIR}/monochromator.o: monochromator.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/monochromator.o monochromator.cpp
+	$(COMPILE.cc) -g -I../../Downloads/libusb-1.0.21/libusb -include ../../Downloads/libusb-1.0.21/libusb/libusb.h -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/monochromator.o monochromator.cpp
 
 # Subprojects
 .build-subprojects:

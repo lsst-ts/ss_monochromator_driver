@@ -37,6 +37,14 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>../../Downloads/libusb-1.0.21/libusb</pElem>
+          </incDir>
+          <incFile>
+            <pElem>../../Downloads/libusb-1.0.21/libusb/libusb.h</pElem>
+          </incFile>
+        </ccTool>
       </compileType>
       <item path="monochromator.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -57,6 +65,15 @@
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>../../Downloads/libusb-1.0.21/libusb</pElem>
+          </incDir>
+          <incFile>
+            <pElem>../../Downloads/libusb-1.0.21/libusb/libusb.h</pElem>
+          </incFile>
+          <preprocessorList>
+            <Elem>-lusb</Elem>
+          </preprocessorList>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
