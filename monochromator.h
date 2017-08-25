@@ -17,24 +17,29 @@
 #include "libusb.h"
 
 //Gets
-float getWavelength();
-float getEntrySlitPosition();
-float getExitSlitPosition();
-int getGrating();
+float getWavelength(libusb_device_handle *devh);
+float getEntrySideSlitPosition(libusb_device_handle *devh);
+float getExitSideSlitPosition(libusb_device_handle *devh);
+bool getGrating1(libusb_device_handle *devh);
+bool getGrating2(libusb_device_handle *devh);
 
-bool getSlitsStatus(); //true if it's moving
-bool getGratingStatus(); //true if it's moving
+bool getSlitsStatus(libusb_device_handle *devh); //true if it's moving
+bool getGratingStatus(libusb_device_handle *devh); //true if it's moving
 
 //Sets
-bool setWavelength(float wavelength);
-bool setEntrySideSlitPosition(float position);
-bool setExitSideSlitPosition(float position);
-bool setGrating(int grating); //1 for 400, 2 for 750
+bool setWavelength(libusb_device_handle *devh,float wavelength);
+bool setEntrySideSlitPosition(libusb_device_handle *devh,float position);
+bool setExitSideSlitPosition(libusb_device_handle *devh,float position);
+bool setGrating(libusb_device_handle *devh,int grating); //1 for 400, 2 for 750
 
-libusb_device_handle *connect();
-bool disconnect(libusb_device_handle *devh);
+libusb_device_handle *MonoConnect();
+bool MonoDisconnect(libusb_device_handle *devh);
 
 bool checkErrors(int result);
+
+//tools 
+float hexToF(unsigned char *data_in);
+int hexToI(unsigned char *data_in);
 
 #endif /* MONOCHROMATOR_H */
 

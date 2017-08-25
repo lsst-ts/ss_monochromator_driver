@@ -12,13 +12,13 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <math.h>
 
-libusb_device_handle *connect(){
+libusb_device_handle *MonoConnect(){
     
     struct libusb_device_handle *devh = NULL;
     int result = libusb_init(NULL);
     int device_ready = 0;
-    
     
     if (result >= 0)
     {
@@ -38,26 +38,23 @@ libusb_device_handle *connect(){
                     else
                     {
                             fprintf(stderr, "libusb_claim_interface error %d\n", result);
-                            return NULL;
                     }
                     
             }
             else
             {
                     fprintf(stderr, "Unable to find the device.\n");
-                    return NULL;
             }
     }
     else
     {
             fprintf(stderr, "Unable to initialize libusb.\n");
-            return NULL;
     }
     
     return devh;
 }
 
-bool disconnect(libusb_device_handle *devh){
+bool MonoDisconnect(libusb_device_handle *devh){
     try{
         libusb_close(devh);
         libusb_exit(NULL);
@@ -80,6 +77,8 @@ bool checkErrors(int result){
 //Gets
 float getWavelength(libusb_device_handle *devh){
     unsigned char data_in[4];
+    
+
     int result = 0;
 
 
@@ -93,9 +92,24 @@ float getWavelength(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    float wavelength = static_cast<float>(*data_in);
-    
+    float wavelength = hexToF(data_in);
+
+    fprintf(stderr, "Wavelength: 0x%02X%02X%02X%02X\n", data_in[3], data_in[2], data_in[1], data_in[0]);
+    fprintf(stderr, "Wavelength: %f\n", wavelength);
+
     return wavelength;
+}
+
+float hexToF(unsigned char *data_in){
+    float number;
+    memcpy(&number,data_in,sizeof(float));
+    return number;
+}
+
+int hexToI(unsigned char *data_in){
+    int number;
+    memcpy(&number,data_in,sizeof(int));
+    return number;
 }
 
 float getEntrySideSlitPosition(libusb_device_handle *devh){
@@ -112,8 +126,8 @@ float getEntrySideSlitPosition(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    float slit_pos = static_cast<float>(*data_in);
-    
+    float slit_pos = hexToI(data_in)*toSlitmm;
+    fprintf(stderr, "slit_pos: %f\n", slit_pos);
     return slit_pos;
 }
 
@@ -131,8 +145,8 @@ float getExitSideSlitPosition(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    float slit_pos = static_cast<float>(*data_in);
-    
+    float slit_pos = hexToI(data_in)*toSlitmm;
+    fprintf(stderr, "slit_pos: %f\n", slit_pos);
     return slit_pos;
 }
 
@@ -151,7 +165,7 @@ bool getGrating1(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    int grating = static_cast<int>(*data_in);
+    int grating = hexToI(data_in);
     if(grating>0) return true;
     return false;
 }
@@ -171,7 +185,7 @@ bool getGrating2(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    int grating = static_cast<int>(*data_in);
+    int grating = hexToI(data_in);
     if(grating>0) return true;
     return false;
 }
@@ -191,7 +205,7 @@ bool getSlitsStatus(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    int slit = static_cast<int>(*data_in);
+    int slit = hexToI(data_in);
     if(slit>0) return true;
     return false;
 }
@@ -200,7 +214,7 @@ bool getSlitsStatus(libusb_device_handle *devh){
 bool getGratingStatus(libusb_device_handle *devh){
     unsigned char data_in[4];
     int result = 0;
-
+    
     result = libusb_control_transfer(
                             devh,
                             0xc0 ,
@@ -211,7 +225,7 @@ bool getGratingStatus(libusb_device_handle *devh){
                             0x04,
                             timeout);
     
-    int slit = static_cast<int>(*data_in);
+    int slit = hexToI(data_in);
     if(slit>0) return true;
     return false;
 }
@@ -219,7 +233,9 @@ bool getGratingStatus(libusb_device_handle *devh){
 bool setWavelength(libusb_device_handle *devh, float wavelength){
     unsigned char data_in[4];
     memcpy(data_in,&wavelength,sizeof(float));
-    
+
+    fprintf(stderr, "Wavelength: 0x%02X%02X%02X%02X\n", data_in[3], data_in[2], data_in[1], data_in[0]);
+
     int result = 0;
 
     result = libusb_control_transfer(
@@ -236,10 +252,11 @@ bool setWavelength(libusb_device_handle *devh, float wavelength){
     return true;
 }
 
-bool setEntrySlitPosition(libusb_device_handle *devh, float position){
+bool setEntrySideSlitPosition(libusb_device_handle *devh, float position){
+    unsigned int position_int = floor(position/toSlitmm);
     unsigned char data_in[4];
-    memcpy(data_in,&position,sizeof(float));
-    
+    memcpy(data_in,&position_int,sizeof(unsigned int));
+    fprintf(stderr, "SlitPosition: 0x%02X%02X%02X%02X\n", data_in[3], data_in[2], data_in[1], data_in[0]);
     int result = 0;
 
     result = libusb_control_transfer(
@@ -256,10 +273,14 @@ bool setEntrySlitPosition(libusb_device_handle *devh, float position){
     return true;
 }
 
-bool setExitSlitPosition(libusb_device_handle *devh, float position){
+bool setExitSideSlitPosition(libusb_device_handle *devh, float position){
+    unsigned int position_int = (position/toSlitmm);
     unsigned char data_in[4];
-    memcpy(data_in,&position,sizeof(float));
-    
+    memcpy(data_in,&position_int,sizeof(unsigned int));
+    fprintf(stderr, "ExitSlit set: %f\n", position);
+    fprintf(stderr, "ExitSlit set 2: %i\n", position_int);
+    fprintf(stderr, "ExitSlit size: %i\n", sizeof(unsigned int));
+    fprintf(stderr, "ExitSlit: 0x%02X%02X%02X%02X\n", data_in[3], data_in[2], data_in[1], data_in[0]);
     int result = 0;
 
     result = libusb_control_transfer(
@@ -281,12 +302,12 @@ bool setGrating(libusb_device_handle *devh, int grating){
     
     int result = -1;
     unsigned char data_in[4];
-    data_in[0]=0x00;
-    data_in[1]=0x00;
+    data_in[3]=0x00;
     data_in[2]=0x00;
+    data_in[1]=0x00;
             
     if(grating == 1){
-        data_in[3] = 0x00;
+        data_in[0] = 0x00;
         result = libusb_control_transfer(
                                 devh,
                                 0x40 ,
@@ -297,7 +318,7 @@ bool setGrating(libusb_device_handle *devh, int grating){
                                 0x04,
                                 timeout);
     }else if(grating == 2){
-        data_in[3] = 0x01;
+        data_in[0] = 0x01;
         result = libusb_control_transfer(
                                 devh,
                                 0x40 ,
@@ -308,7 +329,7 @@ bool setGrating(libusb_device_handle *devh, int grating){
                                 0x04,
                                 timeout);
     }
-    
+    fprintf(stderr, "Grating selected: 0x%02X%02X%02X%02X\n", data_in[3], data_in[2], data_in[1], data_in[0]);
     if(result>=0) return false;
     else return true;
 }

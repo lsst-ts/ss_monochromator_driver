@@ -22,7 +22,8 @@
 #define bmRequestTypeGetJ    0xc0
 #define bmRequestTypeSetJ    0x40
 
-static const int INTERFACE_NUMBER = 1;
+static const double toSlitmm = 0.9955/210;
+static const int INTERFACE_NUMBER = 0;
 static const int timeout = 10000;
 
 #endif /* RESOURCES_H */
