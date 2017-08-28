@@ -22,6 +22,11 @@
 #define bmRequestTypeGetJ    0xc0
 #define bmRequestTypeSetJ    0x40
 
+#define ALLSTOPPED   0
+#define GRATINGMOVING   1
+#define SLITMOVING    2
+#define ALLMOVING    3
+
 static const double toSlitmm = 0.9955/210;
 static const int INTERFACE_NUMBER = 0;
 static const int timeout = 10000;
